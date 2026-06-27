@@ -127,3 +127,11 @@ A **storage abstraction** with two implementations behind one interface — the 
 - **Benchmarks** comparing `Get` on both as N grows — you'll see the map win at scale and *measure* why the slice degrades (O(n) scan). That measurement IS the lesson.
 
 Finish the TODOs, run `go test -bench=. -benchmem ./...`, and bring me the numbers + your read of them. Passing this completes Phase 2; Phase 3 (concurrency) is next.
+
+## Day 10 companion files
+
+- [Debugging challenge](../debugging/README.md) — the benchmark the compiler optimized away.
+- [Pitfalls](../PITFALLS.md) — Trap → Why → Fix.
+- [Interview questions](../INTERVIEW.md) — with model answers.
+- [Notes / cheatsheet](../NOTES.md) — quick reference.
+- [Resources](../RESOURCES.md) — curated links.

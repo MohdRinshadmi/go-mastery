@@ -322,6 +322,17 @@ At scale (50+ services), store your `.proto` files in a dedicated `api/` reposit
 
 ---
 
+## Common mistakes
+
+1. Treating a proto3 scalar's zero value as "unset" — partial-update handlers then clobber fields the client never sent. Use `optional`, wrapper types, or a `FieldMask`.
+2. Changing or reusing a field number to "tidy up" the proto — silent wire corruption for any peer on the old schema. Numbers are forever; `reserved` retired ones.
+3. Returning raw `errors.New` from handlers — clients see `codes.Unknown` and can't branch. Always `status.Errorf(codes.X, ...)`.
+4. No deadline on client calls (`context.Background()`) — a hung downstream blocks the caller forever. Set `context.WithTimeout`; deadlines propagate down the chain.
+5. Load-balancing gRPC at L4 — HTTP/2 multiplexes everything onto one connection, pinning all RPCs to one pod. Use client-side LB or an L7/HTTP-2-aware proxy.
+6. Returning `codes.Unavailable` for a permanent error — meshes auto-retry it, creating a retry storm. Reserve `Unavailable` for genuinely transient failures.
+
+---
+
 ## Expert Thinking Mode
 
 - **Beginner:** "gRPC is like REST but binary and faster."
@@ -361,3 +372,15 @@ Go to `../exercises/`. You will:
 3. Challenge: add a `CancelOrder` unary RPC with proper `NotFound` / `AlreadyShipped` error handling.
 
 See `../examples/` for a working reference implementation first — run it to understand the shape, then close it and implement exercises yourself.
+
+---
+
+## Day 26 companion files
+
+Self-study companions for this day (in `../`):
+
+- [`debugging/`](../debugging/) — the partial-update-clobbers-fields bug (proto3 zero-value vs unset) with `bugged/` and `fixed/`.
+- [`PITFALLS.md`](../PITFALLS.md) — gRPC/protobuf gotchas as Trap → Why → Fix.
+- [`INTERVIEW.md`](../INTERVIEW.md) — interview questions with model answers.
+- [`NOTES.md`](../NOTES.md) — quick reference + key terms.
+- [`RESOURCES.md`](../RESOURCES.md) — curated links (grpc.io, protobuf.dev, Buf).

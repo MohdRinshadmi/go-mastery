@@ -377,3 +377,15 @@ If `once.Do` runs an initialization that fails, it will NOT retry. The failure i
 ## Your tasks for today
 
 Go to `../exercises/`. There are **3 beginner exercises** + **1 intermediate challenge**. Pay special attention to deadlock scenarios — the exercises are designed to trigger your first real deadlocks if you get the pattern wrong.
+
+---
+
+## Day 12 companion files
+
+Self-study materials for this day (all in the day folder):
+
+- [Debugging challenge](../debugging/README.md) — `wg.Add` inside the goroutine: a WaitGroup that returns before the work finishes (`bugged/` vs `fixed/`, caught by `go vet` and `-race`).
+- [Pitfalls](../PITFALLS.md) — 7 select/WaitGroup/Once/buffer traps as Trap → Why → Fix.
+- [Interview Q&A](../INTERVIEW.md) — 10 questions with model answers.
+- [Notes](../NOTES.md) — buffered channels, select, WaitGroup, Once quick reference + key terms.
+- [Resources](../RESOURCES.md) — curated links (select patterns, sync docs, timer leaks).

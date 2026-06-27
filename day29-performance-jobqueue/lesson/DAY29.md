@@ -117,3 +117,15 @@ Core pieces:
 ## Project (in `../exercises/` and `../solutions/`)
 
 Build the **job queue**: a bounded worker pool processing jobs, with **exponential backoff + jitter retries** up to `maxRetries`, and a **dead-letter** collection for jobs that exhaust retries. A flaky job handler (fails the first couple of attempts) proves the retry path; a permanently-failing job proves the dead-letter path. Run it and report how many jobs succeeded vs dead-lettered, and the attempt counts. Reference in `../solutions/`.
+
+---
+
+## Day 29 companion files
+
+Self-study companions for this day (in `../`):
+
+- [`debugging/`](../debugging/) — the hot-path-allocates-a-buffer bug (fixed with `sync.Pool`), including a `-benchmem` benchmark, with `bugged/` and `fixed/`.
+- [`PITFALLS.md`](../PITFALLS.md) — performance & job-queue gotchas as Trap → Why → Fix.
+- [`INTERVIEW.md`](../INTERVIEW.md) — interview questions with model answers.
+- [`NOTES.md`](../NOTES.md) — quick reference + key terms.
+- [`RESOURCES.md`](../RESOURCES.md) — curated links (GC guide, pprof, sync.Pool, backoff+jitter).

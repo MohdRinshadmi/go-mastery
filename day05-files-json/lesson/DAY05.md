@@ -165,3 +165,13 @@ Use a typed struct whenever you can — `map[string]interface{}` pushes type err
 ## Phase 1 Capstone (in `../exercises/`)
 
 A real CLI tool: **`statsgen`** — reads a JSON file of sales records, computes per-category aggregates, and writes a JSON report. It exercises *everything from Phase 1*: slices, maps, structs, pointers, error wrapping, files, and JSON, plus `io.Reader` design. A sample `data.json` is provided. Finish the TODOs, run it against the sample, and bring it for a full PR review. When you pass this, Phase 1 is done and we move to interfaces.
+
+---
+
+## Day 05 companion files
+
+- [Debugging challenge](../debugging/README.md) — unexported struct fields silently vanish from JSON.
+- [Pitfalls](../PITFALLS.md) — Trap → Why it bites → Fix.
+- [Interview questions](../INTERVIEW.md) — with model answers.
+- [Notes / cheatsheet](../NOTES.md) — quick reference.
+- [Resources](../RESOURCES.md) — curated links.

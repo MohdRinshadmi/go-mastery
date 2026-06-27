@@ -368,3 +368,11 @@ s.Log("starting up")  // calls s.Logger.Log() — promoted, not inherited
 ## Your tasks for today
 
 Go to `../exercises/`. You'll implement a shape area calculator, an io.Writer middleware, and a type switch dispatcher — plus a production-grade challenge where you design a notification system using interfaces. Try everything before opening `../solutions/`.
+
+## Day 06 companion files
+
+- [Debugging challenge](../debugging/README.md) — the nil-interface gotcha, live.
+- [Pitfalls](../PITFALLS.md) — Trap → Why → Fix.
+- [Interview questions](../INTERVIEW.md) — with model answers.
+- [Notes / cheatsheet](../NOTES.md) — quick reference.
+- [Resources](../RESOURCES.md) — curated links.

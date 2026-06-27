@@ -127,3 +127,15 @@ An operation safe to apply multiple times with the same effect. Critical in dist
 ## Your tasks
 
 `../exercises/` has a slow "database" (artificial latency) and asks you to: (1) implement a cache-aside `Cache` with per-entry TTL, (2) add **singleflight** so concurrent misses for the same key cause exactly ONE DB call (the demo fires 50 concurrent gets and counts DB calls — prove it's 1), and (3) cache negative lookups. The runnable demo uses an in-memory cache; the real go-redis version is in `solutions/redis_reference.go` (build-ignored). Reference in `../solutions/`.
+
+---
+
+## Day 28 companion files
+
+Self-study companions for this day (in `../`):
+
+- [`debugging/`](../debugging/) — the cache stampede bug (cache-aside without single-flight) with `bugged/` and `fixed/`.
+- [`PITFALLS.md`](../PITFALLS.md) — caching/distributed gotchas as Trap → Why → Fix.
+- [`INTERVIEW.md`](../INTERVIEW.md) — interview questions with model answers.
+- [`NOTES.md`](../NOTES.md) — quick reference + key terms.
+- [`RESOURCES.md`](../RESOURCES.md) — curated links (Redis patterns, singleflight, CAP).

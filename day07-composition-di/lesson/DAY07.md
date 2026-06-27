@@ -297,6 +297,18 @@ func (c *CachedUserStore) Get(id string) (User, error) {
 
 ---
 
+## Common mistakes
+
+1. **Treating embedding as inheritance.** `type Dog struct { Animal }` does NOT make `Dog` an `Animal`. You cannot pass a `Dog` where the type system expects an `Animal`, and there is no `super`. Embedding promotes methods; it does not create an "is-a" relationship. Reach for embedding to *delegate* a responsibility, not to model a taxonomy.
+2. **Method/field shadowing surprises.** If the outer struct declares a field or method with the same name as a promoted one, the outer wins and the promotion is silently hidden — `s.Name` reads the outer `Name`, never the embedded one. Worse, a promoted method that calls another promoted method calls the *embedded* type's version, not your override (Go has no virtual dispatch). When you "override" a method on an embedded type, the embedded type's other methods still call the original.
+3. **Embedding a pointer and forgetting to initialize it.** `type Server struct { *Logger }` leaves `Logger` as a nil `*Logger`. The first promoted `server.Log(...)` call then panics with a nil dereference. Either embed by value or set the pointer in your constructor.
+4. **Returning interfaces from constructors by default.** `func NewUserService(...) UserServicer` locks your API to that contract and forces every new method through the interface. Accept interfaces, *return concrete structs* — callers can always widen a struct to whatever interface they need.
+5. **Creating dependencies inside business logic.** Calling `sql.Open` / `http.DefaultClient` / `time.Now` directly inside a service method makes it untestable and couples it to one implementation. Inject them through the constructor so tests can pass fakes.
+6. **Config struct instead of functional options for optional params.** A `Config{}` passed by value can't distinguish "zero means default" from "zero means off," and adding a field is a breaking change for positional callers. Use functional options for genuinely optional, growing configuration.
+7. **Defining the interface in the producer package.** Putting `OrderStore` in the `store` package forces `service` to import `store` and invites import cycles. Define the interface in the *consumer* (`service`) package; the concrete type satisfies it implicitly.
+
+---
+
 ## Expert Thinking Mode
 
 - **Beginner:** "I embed types so I don't have to copy-paste methods."
@@ -330,3 +342,11 @@ func (c *CachedUserStore) Get(id string) (User, error) {
 ## Your tasks for today
 
 Go to `../exercises/`. Build a payment service with injected storage and notification dependencies. You'll also implement the functional options pattern for a configurable client. Try everything before opening `../solutions/`.
+
+## Day 07 companion files
+
+- [Debugging challenge](../debugging/README.md) — embedding shadowing & no virtual dispatch.
+- [Pitfalls](../PITFALLS.md) — Trap → Why → Fix.
+- [Interview questions](../INTERVIEW.md) — with model answers.
+- [Notes / cheatsheet](../NOTES.md) — quick reference.
+- [Resources](../RESOURCES.md) — curated links.

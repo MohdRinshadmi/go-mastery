@@ -120,3 +120,15 @@ Two deliverables that combine everything from Phase 3:
 2. **Cancellable pipeline** — `gen → square → filterEven`, each stage `select`ing on `ctx.Done()`, with the consumer taking only the first few results and cancelling — and you proving (by design) that no stage leaks.
 
 Run both with `-race`. Passing this completes Phase 3 — you'll have goroutines, channels, select, context, mutexes, worker pools, fan-out/in, and pipelines all under your belt. Phase 4 (building real backends) is next.
+
+---
+
+## Day 15 companion files
+
+Self-study materials for this day (all in the day folder):
+
+- [Debugging challenge](../debugging/README.md) — a pipeline stage with no cancellation path that leaks every upstream goroutine on early consumer exit (`bugged/` vs `fixed/`, proved with `runtime.NumGoroutine()`).
+- [Pitfalls](../PITFALLS.md) — 7 pipeline/cancellation traps as Trap → Why → Fix.
+- [Interview Q&A](../INTERVIEW.md) — 10 questions with model answers.
+- [Notes](../NOTES.md) — pipeline stage shape, close vs cancellation discipline, leak testing + key terms.
+- [Resources](../RESOURCES.md) — curated links (pipelines blog, context, goleak).

@@ -133,3 +133,11 @@ A `CachingUserRepo` can *wrap* the Postgres repo (decorator pattern via composit
 ## Your tasks
 
 `../exercises/` defines a `UserRepository` interface and asks you to: (1) implement `InMemoryUserRepo` (runs offline, used in tests), (2) sketch the `PostgresUserRepo` method signatures mapping `pgx.ErrNoRows`→`ErrUserNotFound`, and (3) a challenge: a `CachingUserRepo` that wraps another `UserRepository` with a tiny in-memory TTL cache (same interface — composition!). A `docker-compose.yml` for Postgres+Redis is provided for when you wire the real thing. The runnable demo uses the in-memory repo so it works without any database. Reference in `../solutions/`.
+
+## Day 19 companion files
+
+- [Debugging challenge](../debugging/README.md) — the repository that leaks its internal pointer (aliasing corruption).
+- [Pitfalls](../PITFALLS.md) — Trap → Why → Fix: injection, missing ctx, leaking ErrNoRows, aliasing, per-request conns, TTL/invalidation, rows.Err(), N+1.
+- [Interview questions](../INTERVIEW.md) — with model answers.
+- [Notes / cheatsheet](../NOTES.md) — quick reference.
+- [Resources](../RESOURCES.md) — curated links.

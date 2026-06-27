@@ -341,3 +341,15 @@ Without directional channels, two teams can accidentally wire a producer to anot
 Go to `../exercises/`. There are **3 beginner exercises** + **1 intermediate challenge**. Run `go run main.go` after each. No peeking at `../solutions/` until you've genuinely tried.
 
 The goal: you should feel the difference between "goroutine launched" and "goroutine finished". That gap — that you can't feel it unless you synchronize — is the most important intuition in concurrent Go.
+
+---
+
+## Day 11 companion files
+
+Self-study materials for this day (all in the day folder):
+
+- [Debugging challenge](../debugging/README.md) — a goroutine leak on an unbuffered channel (`bugged/` vs `fixed/`, proved with `runtime.NumGoroutine()`).
+- [Pitfalls](../PITFALLS.md) — 7 goroutine/channel traps as Trap → Why → Fix.
+- [Interview Q&A](../INTERVIEW.md) — 10 questions with model answers.
+- [Notes](../NOTES.md) — goroutine & channel quick reference + key terms.
+- [Resources](../RESOURCES.md) — curated links (memory model, Pike's talk, leak discipline).

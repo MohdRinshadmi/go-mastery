@@ -140,3 +140,15 @@ func fetchAll(ctx context.Context, urls []string) error {
 ## Your tasks
 
 `../exercises/`: (1) implement a bounded worker pool that squares numbers, (2) implement `fanIn` merging channels, (3) challenge: a concurrent URL-status checker using `errgroup` with `SetLimit` that returns a `map[url]status` and cancels on the first hard error. Run with `-race`. Reference in `../solutions/`.
+
+---
+
+## Day 14 companion files
+
+Self-study materials for this day (all in the day folder):
+
+- [Debugging challenge](../debugging/README.md) — a worker pool that never closes `results`, hanging the consumer (`bugged/` with a watchdog vs `fixed/`).
+- [Pitfalls](../PITFALLS.md) — 7 pool/fan-out/errgroup traps as Trap → Why → Fix.
+- [Interview Q&A](../INTERVIEW.md) — 10 questions with model answers.
+- [Notes](../NOTES.md) — worker pool, fan-in, errgroup quick reference + key terms.
+- [Resources](../RESOURCES.md) — curated links (pipelines blog, errgroup docs, concurrency-patterns talk).

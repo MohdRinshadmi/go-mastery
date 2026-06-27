@@ -164,3 +164,15 @@ A bare `map` accessed by multiple goroutines (one writing) **panics at runtime**
 ## Your tasks
 
 `../exercises/` has: (1) a `SafeCounter` with a deliberate race for you to fix and prove clean under `-race`, (2) a `fetchWithTimeout(ctx, ...)` to implement using `select` + `ctx.Done()`, and (3) a challenge: a concurrency-safe in-memory cache (`map` + `RWMutex`) with `Get`/`Set` that passes `go test -race`. Run everything with `-race` and bring me the output.
+
+---
+
+## Day 13 companion files
+
+Self-study materials for this day (all in the day folder):
+
+- [Debugging challenge](../debugging/README.md) — a data race on a shared map (lost updates + `fatal error: concurrent map writes`), fixed with an `RWMutex` (`bugged/` vs `fixed/`, proved with `-race`).
+- [Pitfalls](../PITFALLS.md) — 7 context/mutex/race traps as Trap → Why → Fix.
+- [Interview Q&A](../INTERVIEW.md) — 10 questions with model answers.
+- [Notes](../NOTES.md) — context, mutex, RWMutex, atomic, race-detector quick reference + key terms.
+- [Resources](../RESOURCES.md) — curated links (context blog, memory model, race detector).

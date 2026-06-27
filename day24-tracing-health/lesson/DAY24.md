@@ -126,3 +126,15 @@ mux.HandleFunc("/readyz", func(w http.ResponseWriter, r *http.Request) {
 ## Your tasks
 
 `../exercises/` has a service with health endpoints to implement: (1) `/healthz` liveness (dumb 200), (2) `/readyz` readiness that checks a simulated dependency with a timeout, and (3) a small manual "span" timer + a challenge to thread a trace ID through context and into structured logs. The runnable demo uses a stdlib-only mini-tracer; the real OTel setup is in `solutions/otel_reference.go` (build-ignored) with run instructions. Reference in `../solutions/`.
+
+---
+
+## Day 24 companion files
+
+Self-contained study material for this day (in the day folder root):
+
+- [Debugging exercise](../debugging/README.md) — liveness that checks the DB (the restart-storm anti-pattern); fixed by splitting liveness vs readiness ([bugged](../debugging/bugged/main.go) vs [fixed](../debugging/fixed/main.go)).
+- [PITFALLS.md](../PITFALLS.md) — 7 tracing/health traps as Trap → Why → Fix.
+- [INTERVIEW.md](../INTERVIEW.md) — interview Q&A with model answers.
+- [NOTES.md](../NOTES.md) — quick reference + key terms.
+- [RESOURCES.md](../RESOURCES.md) — curated links for Day 24.

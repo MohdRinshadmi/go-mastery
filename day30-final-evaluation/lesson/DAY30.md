@@ -93,6 +93,27 @@ The art is choosing per interaction. Gateway→Catalog is sync (user waits for t
 
 ---
 
+## Common mistakes
+
+1. Picking the wrong communication style per interaction — routing a query that needs an immediate answer through async events, or coupling a fire-and-forget side effect into a synchronous call path. Sync for "answer now", async for "happens later."
+2. The dual-write problem — writing the DB then publishing an event as two separate steps, so a publish failure silently loses the side effects. Use the outbox pattern (DB row + event row in one transaction).
+3. Missing idempotency at a layer that retries — HTTP retries, Kafka redelivery, or job retries double-apply effects. Every retrying layer needs its own dedupe (idempotency key, event ID, job ID); they don't cover for each other.
+4. No deadline / context propagation across the call chain — one slow downstream gRPC call hangs a request and the hang cascades up. `context.WithTimeout` on every sync call; pass `ctx` down.
+5. Goroutine leaks in fan-out — a per-request goroutine sends its result on an unbuffered channel and blocks forever once the caller times out. Buffer the channel (cap 1) and/or give the goroutine a `ctx` exit.
+6. Premature microservices — splitting before a real scaling/ownership seam exists, producing a distributed monolith with all the network/consistency costs and none of the benefits. Start from a modular monolith (Day 20).
+
+---
+
+## Real-world use
+
+- **Netflix / Uber / Amazon** run exactly this shape: synchronous gRPC for internal queries, Kafka for event fan-out, Redis caches in front of hot reads, and per-service observability — the architecture this lesson draws is the industry default for large backends.
+- **The outbox pattern** is standard wherever a service must atomically change state and emit an event (Debezium/CDC pipelines implement it at scale) — it's the canonical answer to "the DB committed but the event was lost."
+- **Sagas with compensating actions** power real multi-service workflows (book flight → reserve hotel → charge card, each undoable) because distributed 2PC doesn't scale.
+- **Stripe-style idempotency keys**, **Kafka idempotent consumers**, and **idempotent job handlers** are the same principle applied at three layers of a production order flow — duplicates are a fact of distributed life.
+- **"Monolith first"** (Fowler) is the widely-adopted guidance: most successful microservice systems were extracted from a working monolith along its existing seams, not designed as microservices up front.
+
+---
+
 ## Interview Questions (the synthesis set)
 1. When do you use synchronous gRPC vs asynchronous events between services?
 2. What is the outbox pattern and what problem does it solve?
@@ -109,3 +130,15 @@ The art is choosing per interaction. Gateway→Catalog is sync (user waits for t
 `examples/` simulates the platform **in one process**: an in-memory event bus (Kafka stand-in), a cached catalog (cache-aside), an order "service" that emits `OrderPlaced`, and three idempotent consumers (payment, inventory, email). It ties Days 26–29 together so you can watch a synchronous catalog read + an asynchronous order fan-out in one run. Run: `go run .`
 
 Congratulations on reaching Day 30. Do the final exam — then let's talk about where you go next. 🎓
+
+---
+
+## Day 30 companion files
+
+Self-study companions for this day (in `../`):
+
+- [`debugging/`](../debugging/) — the order→payment goroutine-leak bug (unbuffered result channel + timeout) with `bugged/` and `fixed/`.
+- [`PITFALLS.md`](../PITFALLS.md) — cross-cutting microservices gotchas as Trap → Why → Fix.
+- [`INTERVIEW.md`](../INTERVIEW.md) — the synthesis interview set with model answers.
+- [`NOTES.md`](../NOTES.md) — platform quick reference + key terms.
+- [`RESOURCES.md`](../RESOURCES.md) — curated links (microservices.io, outbox/saga, OpenTelemetry).

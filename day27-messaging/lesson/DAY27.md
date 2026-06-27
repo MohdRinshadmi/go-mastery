@@ -112,3 +112,15 @@ func handleOrderPaid(ctx context.Context, evt OrderPaid) error {
 ## Your tasks
 
 `../exercises/` has an in-memory event bus (a stand-in for Kafka, runs offline) and an **OrderPlaced → [inventory, email]** event flow to wire up — including an **idempotent** consumer that ignores duplicate event IDs (the bus deliberately delivers one event twice so you can prove your dedup works). Real Kafka and RabbitMQ producer/consumer code is in `solutions/broker_reference.go` (build-ignored) with a `docker-compose.yml` to run the brokers. Reference in `../solutions/`.
+
+---
+
+## Day 27 companion files
+
+Self-study companions for this day (in `../`):
+
+- [`debugging/`](../debugging/) — the double-charge bug (at-least-once delivery without idempotency) with `bugged/` and `fixed/`.
+- [`PITFALLS.md`](../PITFALLS.md) — messaging gotchas as Trap → Why → Fix.
+- [`INTERVIEW.md`](../INTERVIEW.md) — interview questions with model answers.
+- [`NOTES.md`](../NOTES.md) — quick reference + key terms.
+- [`RESOURCES.md`](../RESOURCES.md) — curated links (Kafka, RabbitMQ, outbox/saga patterns).

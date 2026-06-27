@@ -14,11 +14,33 @@ A production-focused Go bootcamp. Taught like a senior engineer mentoring a juni
 
 ```
 dayNN-topic/
-  lesson/      # the written lesson (markdown)
-  examples/    # runnable Go I walk you through
-  exercises/   # YOUR code goes here
-  solutions/   # reference answers (try first!)
+  lesson/        # the written lesson (markdown)
+  examples/      # runnable Go I walk you through
+  exercises/     # YOUR code goes here
+  solutions/     # reference answers (try first!)
+  debugging/     # find & fix the bug: bugged/ (broken) + fixed/ (verified)
+  PITFALLS.md    # this day's gotchas: Trap → Why → Fix
+  INTERVIEW.md   # this day's interview Q&A (answers in collapsible blocks)
+  NOTES.md       # this day's quick-reference cheatsheet + key terms
+  RESOURCES.md   # curated links for this day's topic
 ```
+
+Each lesson embeds: Theory · Why it exists · When to use / when NOT (tradeoffs) ·
+Examples · Common mistakes (pitfalls) · Performance · Expert Thinking Mode (mental
+models) · Real-world use · Interview Questions — and links to the five companion
+files above at the bottom. **Every one of the 30 days now carries this full set.**
+
+## Companion tracks (use alongside the days)
+
+These top-level folders cut *across* all 30 days — pull them in whenever you need them:
+
+| Track | What it's for |
+|-------|---------------|
+| [`debugging-challenges/`](debugging-challenges/) | "Find & fix the bug" exercises (one per phase): slice aliasing, nil interface, data race, context leak, ticker leak, unbounded queue. Each has a `bugged/` and a verified `fixed/`. |
+| [`interview-prep/`](interview-prep/) | Consolidated Q&A bank (~129 questions) with model answers in collapsible blocks — one file per phase, for self-quizzing. |
+| [`notes/`](notes/) | Quick reference: `cheatsheet.md`, `glossary.md` (~50 terms), and a consolidated `pitfalls.md` (Trap → Why → Fix). |
+| [`resources/`](resources/) | Curated external resources — official docs, books, talks, tools, style guides — mapped to each phase. |
+| [`COVERAGE.md`](COVERAGE.md) | The full coverage map: every mastery topic and where it lives. |
 
 ## Roadmap
 

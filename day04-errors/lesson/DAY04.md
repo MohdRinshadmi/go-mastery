@@ -230,3 +230,13 @@ Watch out: to capture a `Close()` error you must do it explicitly (named return 
 ## Your tasks
 
 `../exercises/` — three beginner exercises (sentinel errors, wrapping, a custom error type) plus a challenge: a tiny config-loader that distinguishes "file missing" (use a sentinel) from "invalid value" (custom typed error with the field name), wrapping with `%w` along the way and letting the caller branch with `errors.Is` / `errors.As`. Bring it for PR review.
+
+---
+
+## Day 04 companion files
+
+- [Debugging challenge](../debugging/README.md) — a wrapped sentinel never matches `==`, so a soft "not found" leaks as a hard error.
+- [Pitfalls](../PITFALLS.md) — Trap → Why it bites → Fix.
+- [Interview questions](../INTERVIEW.md) — with model answers.
+- [Notes / cheatsheet](../NOTES.md) — quick reference.
+- [Resources](../RESOURCES.md) — curated links.

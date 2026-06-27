@@ -282,6 +282,17 @@ var result []float64 = Map[int, float64]([]int{1, 2}, func(x int) float64 { retu
 
 ---
 
+## Common mistakes
+
+1. **Using `any` when you actually need an operation.** With `[T any]` you can only assign, pass, and return `T` — you cannot `==`, `<`, or `+`. If your function compares or orders values, the constraint must be `comparable` or `constraints.Ordered`. Reaching for `any` and then casting back defeats the entire point of generics.
+2. **Assuming `comparable` covers everything.** Slices, maps, and functions are not comparable, so `Contains[[]int]` won't compile. And `comparable` permits `==` but NOT `<` — ordering needs `constraints.Ordered`. Pick the *narrowest* constraint that supports the operations you actually use.
+3. **Forgetting `~` in custom constraints.** `interface { int | int32 }` matches *only* `int` and `int32` — a named type `type UserID int` will NOT satisfy it. Write `~int | ~int32` so the constraint matches any type whose *underlying* type is one of those. Omitting `~` is the most common "why won't my named type work" bug.
+4. **Returning a bare zero with `T` instead of the comma-ok form.** `func Get[T any](m map[string]T, key string) T` can't signal "missing" — the zero value of `T` is ambiguous (is `0`/`""`/`nil` a real value or a miss?). Return `(T, bool)` so the caller can tell.
+5. **Reaching for generics with only one or two concrete types.** If a function is only ever called with `int`, just write it for `int`; if there are two types with the *same* behavior, two small functions are often clearer than a generic. Generics earn their keep at 3+ types or for reusable data structures — not as a reflex.
+6. **Generics in public APIs that should be interfaces.** A signature like `func Process[T Processor[V], V any](...)` is hard to read, hard to mock, and hard to evolve. Generics are an implementation tool; export interfaces or concrete types and keep the type-parameter machinery inside.
+
+---
+
 ## Expert Thinking Mode
 
 - **Beginner:** "Generics let me write one function that works for int and string."
@@ -315,3 +326,11 @@ var result []float64 = Map[int, float64]([]int{1, 2}, func(x int) float64 { retu
 ## Your tasks for today
 
 Go to `../exercises/`. Implement a generic Set type, a generic Result type, generic Map/Filter/Reduce functions, and a challenge where you build a type-safe generic event bus. Try everything before opening `../solutions/`.
+
+## Day 08 companion files
+
+- [Debugging challenge](../debugging/README.md) — the bare-zero generic lookup bug.
+- [Pitfalls](../PITFALLS.md) — Trap → Why → Fix.
+- [Interview questions](../INTERVIEW.md) — with model answers.
+- [Notes / cheatsheet](../NOTES.md) — quick reference.
+- [Resources](../RESOURCES.md) — curated links.

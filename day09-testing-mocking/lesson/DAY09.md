@@ -165,3 +165,11 @@ It's optional sugar — std `testing` is complete on its own — but it's near-u
 ## Your tasks
 
 `../exercises/` has a `wallet.go` with a `Charger` interface and a `Withdraw`/`Checkout` function, plus a `wallet_test.go` skeleton. Write: (1) a table-driven test for the pure logic, (2) a hand-written fake `Charger` to test the checkout path including the gateway-failure case. Run `go test -v ./...` until green. Reference in `../solutions/`.
+
+## Day 09 companion files
+
+- [Debugging challenge](../debugging/README.md) — the false-green table test.
+- [Pitfalls](../PITFALLS.md) — Trap → Why → Fix.
+- [Interview questions](../INTERVIEW.md) — with model answers.
+- [Notes / cheatsheet](../NOTES.md) — quick reference.
+- [Resources](../RESOURCES.md) — curated links.

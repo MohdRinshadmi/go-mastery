@@ -1,0 +1,20 @@
+# Compiled Go binaries (build artifacts — `go run`/`go build` output).
+# Each module's binary is named after its folder (examples, exercises, solutions,
+# bugged, fixed, server, ...). They are not source and must never be committed.
+# These patterns match an extension-less executable that shares its dir name.
+day*/examples/examples
+day*/exercises/exercises
+day*/solutions/solutions
+**/debugging/bugged/bugged
+**/debugging/fixed/fixed
+debugging-challenges/**/bugged/bugged
+debugging-challenges/**/fixed/fixed
+**/examples/server
+
+# Generic Go build artifacts
+*.exe
+*.test
+*.out
+
+# macOS junk
+.DS_Store

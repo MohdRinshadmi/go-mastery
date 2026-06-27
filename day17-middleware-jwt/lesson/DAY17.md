@@ -328,6 +328,17 @@ admin.Use(authRequired(), requireRole("admin"))
 
 ---
 
+## Common mistakes
+
+- **Middleware that forgets to call `next.ServeHTTP` / `c.Next()`.** The chain stops silently — no panic, no error, just a hung-feeling request that never reaches your handler. If a route "does nothing," check that every middleware actually passes control downstream.
+- **Comparing secrets or signatures with `==`.** String comparison short-circuits on the first differing byte, leaking timing information an attacker can measure. Always use `hmac.Equal` (constant-time) for signatures and secret comparisons.
+- **Not verifying the signing method.** If you accept whatever `alg` the token claims, an attacker sends `alg:none` and you validate a token with no signature. Pin the method (`*jwt.SigningMethodHMAC`) before trusting anything.
+- **Skipping the `exp` check.** A signature can be perfectly valid and the token still expired. Verifying the signature is necessary, not sufficient — always check `exp` (and `iat`/`nbf` if you set them).
+- **Treating the JWT payload as secret.** It's signed, not encrypted. Anyone can base64-decode it. Never put passwords, PII, or anything you wouldn't print in a log inside the claims.
+- **Returning 200 on auth failure.** Binding/validation errors swallowed, or `c.Abort()` forgotten so the handler runs anyway — the request succeeds when it should have been rejected. Abort *and* `return`; an aborted-but-not-returned handler keeps executing.
+
+---
+
 ## 7. Performance Implications
 
 - JWT verification is a cryptographic operation (HMAC-SHA256). It's fast — sub-microsecond on modern hardware. Not a bottleneck.
@@ -372,3 +383,13 @@ admin.Use(authRequired(), requireRole("admin"))
 Go to `../exercises/`. You'll implement a login endpoint that issues a JWT and a protected profile endpoint that verifies it. The challenge builds RBAC. Fill in the TODOs.
 
 Don't peek at `../solutions/` until you've tried.
+
+---
+
+## Day 17 companion files
+
+- [Debugging challenge](../debugging/README.md) — the expired-token-accepted bug (stdlib JWT-like token, missing `exp` check).
+- [Pitfalls](../PITFALLS.md) — Trap → Why → Fix for middleware and JWT footguns.
+- [Interview questions](../INTERVIEW.md) — the lesson's 7 plus deeper follow-ups, with model answers.
+- [Notes / cheatsheet](../NOTES.md) — middleware shape, JWT parts, verify checklist, validator tags.
+- [Resources](../RESOURCES.md) — curated links (jwt.io, RFC 7519, OWASP, golang-jwt).

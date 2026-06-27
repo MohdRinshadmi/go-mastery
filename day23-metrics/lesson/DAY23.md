@@ -124,3 +124,15 @@ Prometheus Alertmanager fires alerts on PromQL conditions: "error rate > 1% for 
 ## Your tasks
 
 `../exercises/` has an HTTP service missing its instrumentation. Add: (1) a `http_requests_total` counter with `method/path/status` labels, (2) a `http_request_duration_seconds` histogram, (3) a middleware that records both, and (4) the `/metrics` endpoint. Run it, hit some routes, and `curl /metrics` to see your series. Then write the PromQL for error-rate and p99. Reference + a Grafana panel note in `../solutions/`.
+
+---
+
+## Day 23 companion files
+
+Self-contained study material for this day (in the day folder root):
+
+- [Debugging exercise](../debugging/README.md) — a metrics counter with a data race (undercounts, panics under load); fixed with a mutex + bounded label cardinality ([bugged](../debugging/bugged/main.go) vs [fixed](../debugging/fixed/main.go)). Run with `go run -race .`.
+- [PITFALLS.md](../PITFALLS.md) — 7 metrics traps as Trap → Why → Fix.
+- [INTERVIEW.md](../INTERVIEW.md) — interview Q&A with model answers.
+- [NOTES.md](../NOTES.md) — quick reference + key terms.
+- [RESOURCES.md](../RESOURCES.md) — curated links for Day 23.

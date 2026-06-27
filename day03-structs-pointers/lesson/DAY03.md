@@ -561,3 +561,13 @@ for i, v := range items {
 Go to `../exercises/`. There are **3 beginner exercises** + **1 intermediate challenge** with starter files. Fill them in, run them, and tell me when done. I will review each like a production PR.
 
 Don't open `../solutions/` until you've tried. I'll know. 😄
+
+---
+
+## Day 03 companion files
+
+- [Debugging challenge](../debugging/README.md) — value receivers silently discard every deposit and withdrawal.
+- [Pitfalls](../PITFALLS.md) — Trap → Why it bites → Fix.
+- [Interview questions](../INTERVIEW.md) — with model answers.
+- [Notes / cheatsheet](../NOTES.md) — quick reference.
+- [Resources](../RESOURCES.md) — curated links.

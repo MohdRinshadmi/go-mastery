@@ -137,3 +137,11 @@ curl -s localhost:8080/products
 ## Your tasks (`exercises/`)
 
 `exercises/TASKS.md` lists extensions to implement on top of the runnable app: (1) add `GET /orders/{id}` with an ownership check (a customer may only read their own orders — RBAC at the service layer), (2) add stock tracking to products and reject orders that exceed stock with `ErrValidation`, (3) challenge: add an `admin`-only `GET /users` endpoint. Implement them in the layered structure, keep handlers thin, and bring it for a full PR-style review. Passing this completes Phase 4.
+
+## Day 20 companion files
+
+- [Debugging challenge](../debugging/README.md) — the nil-dependency-at-the-composition-root bug (wrong status from a wiring fault).
+- [Pitfalls](../PITFALLS.md) — Trap → Why → Fix for the layering traps (logic in handlers, broken layering, leaked driver errors, nil DI, scattered RBAC, duplicated error mapping, anemic domain).
+- [Interview questions](../INTERVIEW.md) — the lesson's 7 plus deeper ones (dependency inversion vs injection, transaction boundaries, monolith → microservices, thin handlers), with model answers.
+- [Notes / cheatsheet](../NOTES.md) — quick reference: layer diagram, the golden rule, composition root, `statusFor()`, authn/authz/RBAC, `internal/`.
+- [Resources](../RESOURCES.md) — curated links on Go project layout, clean architecture, and writing HTTP services.

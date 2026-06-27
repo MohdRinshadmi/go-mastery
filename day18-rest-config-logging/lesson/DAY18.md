@@ -159,3 +159,11 @@ slog.Info("order created",
 ## Your tasks
 
 `../exercises/` has a small REST service skeleton: a `/products` endpoint, a `Config.Load` to finish (env + validation + fail-fast), and slog wiring to complete (JSON handler, request-scoped logger with a request_id, correct status codes + consistent error JSON). Run it, `curl` it, and bring me the log output + your config validation. Reference in `../solutions/`.
+
+## Day 18 companion files
+
+- [Debugging challenge](../debugging/README.md) — config that starts broken: `Load()` doesn't fail fast on a missing `JWT_SECRET`.
+- [Pitfalls](../PITFALLS.md) — Trap → Why → Fix for status codes, config, secrets, and logging.
+- [Interview questions](../INTERVIEW.md) — with model answers (status codes, 12-factor, slog, idempotency).
+- [Notes / cheatsheet](../NOTES.md) — quick reference: status table, error JSON, thin handler, config Load, slog setup.
+- [Resources](../RESOURCES.md) — curated links (slog docs/blog, 12-factor, MDN status codes).

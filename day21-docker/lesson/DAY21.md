@@ -282,3 +282,15 @@ Go to `../exercises/`. You have:
 3. A compose challenge (add Redis to an existing compose file)
 
 Build, run, verify the containers start and the HTTP endpoints respond. I'll review your Dockerfile like a production PR — I'll check for root users, missing CA certs, layer ordering, and image size.
+
+---
+
+## Day 21 companion files
+
+Self-contained study material for this day (in the day folder root):
+
+- [Debugging exercise](../debugging/README.md) — "works on my laptop, dead in the container": a service that binds `127.0.0.1` and is unreachable from outside the container ([bugged](../debugging/bugged/main.go) vs [fixed](../debugging/fixed/main.go)).
+- [PITFALLS.md](../PITFALLS.md) — 7 Docker/Go traps as Trap → Why → Fix.
+- [INTERVIEW.md](../INTERVIEW.md) — interview Q&A with model answers.
+- [NOTES.md](../NOTES.md) — quick reference + key terms.
+- [RESOURCES.md](../RESOURCES.md) — curated links for Day 21.

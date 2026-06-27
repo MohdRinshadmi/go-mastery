@@ -362,3 +362,11 @@ api := r.Group("/api/v1")
 Go to `../exercises/`. You'll build a small product catalog API — first in pure stdlib, then in Gin. Fill in the TODOs and run both servers. I'll review like a real PR.
 
 Don't peek at `../solutions/` until you've tried.
+
+## Day 16 companion files
+
+- [Debugging challenge](../debugging/README.md) — the lost-status-code bug: writing the body before `WriteHeader`.
+- [Pitfalls](../PITFALLS.md) — Trap → Why → Fix.
+- [Interview questions](../INTERVIEW.md) — with model answers.
+- [Notes / cheatsheet](../NOTES.md) — quick reference.
+- [Resources](../RESOURCES.md) — curated links.

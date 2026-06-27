@@ -150,3 +150,15 @@ Also drain on shutdown: flush logs/traces, close the DB pool, finish in-flight b
 ## Your tasks
 
 `../exercises/`: (1) add a per-IP rate-limiting middleware returning 429, (2) configure an `http.Server` with sane timeouts, and (3) implement graceful shutdown with `signal.NotifyContext` + `srv.Shutdown` that drains in-flight requests. The runnable demo lets you `curl` fast to trigger 429 and Ctrl-C to watch a clean drain. Reference in `../solutions/`. Passing this completes Phase 5 — your service is production-grade.
+
+---
+
+## Day 25 companion files
+
+Self-contained study material for this day (in the day folder root):
+
+- [Debugging exercise](../debugging/README.md) — graceful shutdown bug: `srv.Close()` drops in-flight requests on every deploy; fixed with `srv.Shutdown(ctx)` ([bugged](../debugging/bugged/main.go) vs [fixed](../debugging/fixed/main.go)). Run with `go run -race .`.
+- [PITFALLS.md](../PITFALLS.md) — 8 rate-limit/shutdown traps as Trap → Why → Fix.
+- [INTERVIEW.md](../INTERVIEW.md) — interview Q&A with model answers.
+- [NOTES.md](../NOTES.md) — quick reference + key terms.
+- [RESOURCES.md](../RESOURCES.md) — curated links for Day 25.

@@ -1,0 +1,54 @@
+# Go Glossary — ~50 Terms, One Sentence Each
+
+> Drill: read the term, say the definition out loud, *then* read it. Alphabetized.
+
+- **atomic operation** — A read-modify-write on a single value (`sync/atomic`, `atomic.Int64`) that completes indivisibly, so concurrent goroutines can't interleave it; faster than a mutex for one counter.
+- **backing array** — The contiguous block of memory a slice points into; multiple slices can share one backing array, which is the root of the aliasing gotcha.
+- **buffered channel** — A channel with capacity > 0 that only blocks the sender when full and the receiver when empty, decoupling them up to the buffer size.
+- **build tag** — A `//go:build` constraint at the top of a file that includes or excludes it from a build based on OS, arch, or custom flags.
+- **capacity (cap)** — The number of elements a slice can hold before `append` must allocate a new, larger backing array; the third field of the slice header.
+- **channel** — A typed, internally-synchronized conduit for passing values between goroutines; Go's primary coordination primitive ("share memory by communicating").
+- **closure** — A function value that captures and references variables from its surrounding scope, keeping them alive as long as the closure lives.
+- **comma-ok idiom** — The two-value form (`v, ok := m[k]`, `v, ok := <-ch`, `x, ok := i.(T)`) that distinguishes presence/success from a zero value.
+- **constraint** — An interface used as a type parameter's bound in generics, listing the methods or the type set (e.g. `comparable`, `constraints.Ordered`) a type must satisfy.
+- **context** — A value (`context.Context`) that propagates cancellation, deadlines, and request-scoped data down a call tree; conventionally the first parameter.
+- **CSP (Communicating Sequential Processes)** — Tony Hoare's 1978 model, the basis for Go's concurrency: independent processes coordinating by passing messages rather than sharing memory.
+- **data race** — Two goroutines accessing the same memory concurrently with at least one write and no synchronization, producing undefined behavior.
+- **deadlock** — A state where goroutines are all blocked waiting on each other (or on a channel that will never receive/send), so none can proceed.
+- **deferred call** — A function call scheduled with `defer` to run in LIFO order when the surrounding function returns, on every return path including panics.
+- **directional channel** — A channel typed as send-only (`chan<- T`) or receive-only (`<-chan T`) in a signature, enforcing the producer/consumer contract at compile time.
+- **embedding** — Declaring a type inside a struct without a field name so its fields and methods are promoted, achieving composition (Go has no inheritance).
+- **errgroup** — `golang.org/x/sync/errgroup`: a `WaitGroup` that collects the first error from a group of goroutines and cancels a shared context when one fails.
+- **escape analysis** — The compiler's determination of whether a value can live on the stack or must "escape" to the heap (and be GC'd), affecting allocation cost.
+- **fan-in** — A concurrency pattern that merges values from multiple input channels into a single output channel.
+- **fan-out** — A concurrency pattern where multiple goroutines read from one channel to process work in parallel.
+- **generics** — Type parameters (`func F[T any](...)`) that let one function or type work over many types with compile-time type safety, no `interface{}` boxing.
+- **GMP scheduler** — Go's M:N runtime scheduler mapping G (goroutines) onto M (OS threads) via P (processors/GOMAXPROCS), parking blocked goroutines without blocking threads.
+- **goroutine** — A lightweight (~2KB growable stack) function execution multiplexed onto OS threads by the Go runtime, launched with `go`.
+- **goroutine leak** — A goroutine that is started but never exits, permanently holding memory/locks/FDs and accumulating until the process OOMs.
+- **graceful shutdown** — Stopping a service by refusing new work, finishing in-flight requests within a deadline, and releasing resources, typically via `Server.Shutdown(ctx)`.
+- **happens-before** — The Go memory model's ordering relation; if event A happens-before B, A's writes are visible to B, and synchronization primitives establish it.
+- **interface satisfaction** — The implicit, structural rule that a type implements an interface simply by having all its methods — no `implements` declaration.
+- **iota** — A `const`-block counter that resets to 0 and increments per line, used to build enums and bit flags concisely.
+- **memory model** — Go's formal specification of when a write by one goroutine is guaranteed visible to a read by another, defined via happens-before.
+- **method set** — The set of methods callable on a type: value `T` has its value-receiver methods; pointer `*T` has both value- and pointer-receiver methods.
+- **middleware** — A function that wraps an `http.Handler` to run cross-cutting logic (logging, auth, recover, rate-limit) before/after the next handler.
+- **monomorphization** — Generating specialized code per concrete type for a generic; Go uses a partial form (GC-shape stenciling) rather than full monomorphization.
+- **mutex** — `sync.Mutex`, a lock granting one goroutine exclusive access to shared state; `RWMutex` allows many readers or one writer.
+- **nil interface** — An interface value with both type and value nil; an interface holding a nil pointer of a concrete type is **non-nil** (the classic gotcha).
+- **panic** — A runtime stop that unwinds the stack; un-recovered it crashes the program, reserved for unrecoverable/impossible states, not expected errors.
+- **pipeline** — A chain of stages where each is a goroutine reading from an input channel and writing to an output channel, `defer close`-ing on completion.
+- **race condition** — A bug whose outcome depends on the nondeterministic timing/interleaving of concurrent operations; a data race is one cause.
+- **recover** — A builtin, useful only inside a deferred function, that stops a panic's unwind and lets the function return normally.
+- **sentinel error** — A package-level error value (e.g. `io.EOF`, `ErrNotFound`) compared with `errors.Is` to signal a specific, expected condition.
+- **select** — A statement that blocks until one of several channel operations is ready, choosing randomly among ready cases; `default` makes it non-blocking.
+- **slice header** — The 3-word struct `{pointer, len, cap}` that *is* a slice; copying a slice copies this header, not the backing array.
+- **struct tag** — A backtick string after a field (`json:"name,omitempty"`) read via reflection by packages like encoding/json to drive (un)marshaling.
+- **type assertion** — Extracting a concrete type from an interface value: `v, ok := i.(T)`; the one-value form panics on mismatch, the comma-ok form doesn't.
+- **type switch** — A `switch v := i.(type)` that branches on the dynamic type held by an interface value.
+- **unbuffered channel** — A zero-capacity channel where a send blocks until a receiver is ready (and vice versa), making each exchange a synchronization point/rendezvous.
+- **vendoring** — Committing dependencies into a `./vendor` directory (`go mod vendor`) so builds are reproducible without fetching from the network.
+- **WaitGroup** — `sync.WaitGroup`, a counter to wait for a set of goroutines: `Add(n)`, each `Done()`, then `Wait()` blocks until the count hits zero.
+- **worker pool** — A fixed set of goroutines draining a shared jobs channel, bounding concurrency and reusing goroutines instead of spawning one per task.
+- **zero value** — The default a variable gets with no initializer (`0`, `""`, `false`, `nil`), guaranteeing every Go value is usable, never undefined.
+- **go.mod / go.sum** — `go.mod` declares the module path, Go version, and dependency requirements; `go.sum` records cryptographic checksums of those deps for integrity.

@@ -273,6 +273,17 @@ GitHub Actions secrets are encrypted at rest and injected at runtime — they ne
 
 ---
 
+## Common mistakes
+
+1. **Flaky tests treated as noise.** A test that depends on map iteration order, `time.Now()`, goroutine scheduling, or shared global state passes locally and fails intermittently in CI. Engineers learn to "just retry" — and a real regression eventually hides in the noise. Pin down the non-determinism (sort keys, inject a clock, run `-race` and `-shuffle=on`) and treat a flake as a Sev-1 bug, not a retry.
+2. **Not running `-race` in CI.** The race detector only catches a data race if the racy code path actually executes under it. Skipping `go test -race` because "it's slow" means real concurrency bugs ship — far more expensive than a 2–10× slower test job.
+3. **CI that can't be reproduced locally.** If CI does things no developer can run (magic env vars, implicit setup), failures become un-debuggable. Make `make ci` run the exact same lint/test/build so "it works on my machine" is impossible.
+4. **Tagging images `latest` only.** `latest` is mutable — you can't tell what's deployed or roll back deterministically. Always tag with the immutable git SHA (`ghcr.io/org/app:a1b2c3d`).
+5. **No caching → slow pipeline.** Forgetting `cache: true` on `setup-go` (or not caching the module/build cache) re-downloads and recompiles everything every run. Slow CI makes engineers batch changes, which makes each deploy riskier.
+6. **Lint/test failures that don't block merge.** Status checks that aren't *required* by branch protection are decorative — broken code still merges. Make the CI jobs required checks and disallow bypass.
+
+---
+
 ## Expert Thinking Mode
 
 - **Beginner:** "CI runs my tests automatically. Convenient."
@@ -312,3 +323,15 @@ Go to `../exercises/`. You have:
 4. A Makefile to write
 
 These exercises are about understanding the pipeline, not just syntax. For each one, explain in a comment *why* each choice matters.
+
+---
+
+## Day 22 companion files
+
+Self-contained study material for this day (in the day folder root):
+
+- [Debugging exercise](../debugging/README.md) — the flaky test: code that depends on Go's randomized map iteration order, green locally and red in CI ([bugged](../debugging/bugged/main.go) vs [fixed](../debugging/fixed/main.go)).
+- [PITFALLS.md](../PITFALLS.md) — 7 CI/CD traps as Trap → Why → Fix.
+- [INTERVIEW.md](../INTERVIEW.md) — interview Q&A with model answers.
+- [NOTES.md](../NOTES.md) — quick reference + key terms.
+- [RESOURCES.md](../RESOURCES.md) — curated links for Day 22.
