@@ -1,0 +1,41 @@
+# .dockerignore — keep the build context lean.
+# Without this, Docker sends your entire working tree (including .git, test
+# files, binaries) to the daemon before any build step runs. On a large repo
+# that can add minutes.
+
+# Version control
+.git
+.gitignore
+
+# Secrets and local config (NEVER send these to the Docker daemon)
+.env
+*.env
+.env.*
+secrets/
+*.pem
+*.key
+
+# Dev tooling
+.idea/
+.vscode/
+.DS_Store
+
+# Docker files themselves (no need in build context)
+docker-compose*.yml
+Dockerfile*
+
+# Generated artifacts (we rebuild inside Docker)
+bin/
+dist/
+*.out
+coverage.out
+
+# Documentation
+*.md
+docs/
+
+# Test files (not needed in the final image)
+**/*_test.go
+
+# Dependencies (downloaded fresh inside the container)
+vendor/

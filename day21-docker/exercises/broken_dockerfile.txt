@@ -1,0 +1,17 @@
+# Day 21 Exercise 2 — Find the 4 mistakes in this Dockerfile.
+# Write your fixes in fixed_dockerfile.txt.
+# Hints: think about CGO, user, CA certs, and layer ordering.
+
+FROM golang:1.22-alpine AS builder
+
+WORKDIR /app
+COPY . .
+COPY go.mod go.sum ./
+RUN go mod download
+
+RUN go build -o /server .
+
+FROM scratch
+COPY --from=builder /server /server
+EXPOSE 8080
+ENTRYPOINT ["/server"]

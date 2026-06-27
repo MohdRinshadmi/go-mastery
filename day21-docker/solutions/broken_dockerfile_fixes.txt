@@ -1,0 +1,34 @@
+# Day 21 Exercise 2 — The 4 mistakes in broken_dockerfile.txt
+
+# MISTAKE 1 — Layer ordering (WORST performance mistake)
+# Wrong:
+#   COPY . .              <- copies ALL source first
+#   COPY go.mod go.sum ./ <- then copies deps
+#   RUN go mod download
+# Fixed: always copy go.mod + go.sum BEFORE source so the dep download
+# layer is cached and only re-runs when deps change, not on every code edit.
+
+# MISTAKE 2 — Missing CGO_ENABLED=0
+# Wrong:  go build -o /server .
+# The binary links against glibc dynamically. FROM scratch has no glibc.
+# The container will crash: "exec /server: no such file or directory"
+# Fixed:  CGO_ENABLED=0 go build -o /server .
+
+# MISTAKE 3 — Missing -ldflags="-s -w"
+# Not a correctness bug but a size/security issue: the binary includes debug
+# symbols and DWARF tables, making it 30-40% larger than necessary.
+# Fixed:  CGO_ENABLED=0 go build -ldflags="-s -w" -o /server .
+
+# MISTAKE 4 — Running as root / no USER directive
+# FROM scratch runs as root by default. Best practice: never run prod
+# containers as root. You need to create the user in the builder stage
+# (since scratch has no useradd) and use USER in the runtime stage.
+# Fixed in the runtime stage:
+#   USER nonroot:nonroot
+# (Or use distroless/static:nonroot which provides the user for you.)
+
+# BONUS MISTAKE (scratch-specific): missing CA certificates
+# If this service makes any HTTPS calls, they will fail because scratch has
+# no root certificates. Fix: copy from builder.
+#   COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+# Or switch to gcr.io/distroless/static:nonroot which includes them.

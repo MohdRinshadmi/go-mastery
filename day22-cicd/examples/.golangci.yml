@@ -1,0 +1,86 @@
+# Day 22 — golangci-lint configuration
+# Run: golangci-lint run ./...
+
+run:
+  timeout: 5m
+  # Run on all Go files including tests
+  tests: true
+
+linters:
+  # Start from the default set and add more
+  enable:
+    # Built-in go vet checks
+    - govet
+
+    # Catches unchecked errors — the #1 Go bug in production codebases.
+    # If a function returns error and you ignore it, this flags it.
+    - errcheck
+
+    # The best single Go linter. Catches: deprecated APIs, suspicious
+    # nil pointer patterns, unnecessary type conversions, unreachable code.
+    - staticcheck
+
+    # Ineffectual assignments: x = y but x is never used after.
+    - ineffassign
+
+    # Unused code: unexported functions/types/vars that are never called.
+    - unused
+
+    # Security scanner: SQL injection, weak crypto, hardcoded credentials,
+    # HTTP instead of HTTPS, path traversal.
+    - gosec
+
+    # Catches http.Response.Body not being closed — connection leak.
+    - bodyclose
+
+    # Style and performance: unnecessary else, append in a loop that could
+    # pre-allocate, redundant type conversions.
+    - gocritic
+
+    # Enforces consistent error message format (no capitals, no trailing dot).
+    - stylecheck
+
+  # Explicitly disabled — with reasoning. Never disable without explaining why.
+  disable:
+    # depguard: we don't need to restrict which packages can be imported yet.
+    - depguard
+    # gochecknoglobals: we use package-level vars for version metadata.
+    # A real project might enable this in non-main packages.
+    - gochecknoglobals
+
+linters-settings:
+  errcheck:
+    # Also check error from assignments in if/switch/for bodies.
+    check-type-assertions: true
+    check-blank: true
+
+  gosec:
+    severity: medium
+    # Don't flag test files for hardcoded credentials.
+    excludes:
+      - G101  # hardcoded credentials — too many false positives in tests
+
+  gocritic:
+    enabled-tags:
+      - diagnostic
+      - performance
+
+  stylecheck:
+    checks:
+      - "ST1003"  # naming conventions
+      - "ST1016"  # consistent receiver names
+
+issues:
+  # Allow some linters to be noisier in test files.
+  exclude-rules:
+    - path: _test\.go
+      linters:
+        - errcheck   # tests often call helpers and ignore errors
+        - gosec      # tests can use weak crypto for speed
+    - path: main\.go
+      linters:
+        - gochecknoglobals  # main packages legitimately have package-level vars
+
+  # Max issues to show (0 = unlimited).
+  max-issues-per-linter: 50
+  max-same-issues: 3

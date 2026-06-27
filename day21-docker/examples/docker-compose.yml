@@ -1,0 +1,98 @@
+# =============================================================================
+# Day 21 — Docker Compose: shop-api + Postgres + Redis
+# =============================================================================
+#
+# Usage:
+#   docker compose up -d          # start all services in the background
+#   docker compose logs -f api    # tail the api logs
+#   docker compose ps             # check status
+#   docker compose down           # stop and remove containers (data in volumes persists)
+#   docker compose down -v        # stop AND delete volumes (wipes DB)
+#
+# The API will be at http://localhost:8080
+
+services:
+
+  # --------------------------------------------------------------------------
+  # api — our Go e-commerce service
+  # --------------------------------------------------------------------------
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      # These build args bake version metadata into the binary.
+      # In CI you'd pass real values: VERSION=$(git describe --tags)
+      args:
+        VERSION: "v0.1.0-dev"
+        GIT_COMMIT: "local"
+        BUILD_TIME: "now"
+    image: shop-api:dev
+    ports:
+      - "8080:8080"
+    environment:
+      PORT: "8080"
+      DATABASE_URL: "postgres://shopuser:shoppass@postgres:5432/shopdb?sslmode=disable"
+      REDIS_URL: "redis://redis:6379"
+    depends_on:
+      postgres:
+        condition: service_healthy   # wait until postgres is actually accepting connections
+      redis:
+        condition: service_started
+    restart: unless-stopped
+    # Resource limits — good practice even in dev.
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+
+  # --------------------------------------------------------------------------
+  # postgres — the primary database
+  # --------------------------------------------------------------------------
+  postgres:
+    image: postgres:16-alpine     # ALWAYS pin the version. Never use :latest.
+    environment:
+      POSTGRES_USER: shopuser
+      POSTGRES_PASSWORD: shoppass
+      POSTGRES_DB: shopdb
+    volumes:
+      # Named volume — data persists across docker compose down / up.
+      # Without this, every restart wipes your database.
+      - pgdata:/var/lib/postgresql/data
+      # Optional: mount SQL init scripts.
+      # - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"   # expose for local psql/pgAdmin access
+    healthcheck:
+      # pg_isready checks that the DB is accepting connections.
+      # depends_on: condition: service_healthy waits for this to pass.
+      test: ["CMD-SHELL", "pg_isready -U shopuser -d shopdb"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+
+  # --------------------------------------------------------------------------
+  # redis — cache / session store
+  # --------------------------------------------------------------------------
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes   # enable persistence (AOF)
+    volumes:
+      - redisdata:/data
+    ports:
+      - "6379:6379"   # expose for local redis-cli access
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
+# Named volumes — Docker manages these on the host.
+# They persist across container restarts and even docker compose down.
+# Use: docker volume ls   to see them.
+# Use: docker compose down -v   to delete them (wipes data!).
+volumes:
+  pgdata:
+  redisdata:

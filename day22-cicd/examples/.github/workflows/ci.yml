@@ -1,0 +1,195 @@
+# Day 22 — Production CI/CD workflow for a Go service
+#
+# This workflow runs on every push and pull request. It:
+#   1. Lints with golangci-lint
+#   2. Tests with the race detector and coverage
+#   3. Builds for multiple platforms
+#   4. Builds and pushes a Docker image (on main only)
+#
+# Study this carefully. Every decision here has been made for a reason.
+# The comments explain the "why" — not just the "what."
+
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  # Allow manual trigger — useful for debugging CI issues.
+  workflow_dispatch:
+
+# Cancel in-progress runs for the same branch (saves CI minutes).
+# If you push twice quickly, the first run is cancelled.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# Default permissions — principle of least privilege.
+# Individual jobs can grant more if needed.
+permissions:
+  contents: read
+
+jobs:
+
+  # ============================================================
+  # Job 1: Lint
+  # ============================================================
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+          # Cache the Go module download cache. Without this, every run
+          # re-downloads all dependencies (~30s-2min depending on deps).
+          cache: true
+
+      # go vet is fast and catches real bugs. Always run it before golangci-lint.
+      - name: go vet
+        run: go vet ./...
+
+      # golangci-lint runs 50+ linters in parallel. This action caches the
+      # golangci-lint binary and the analysis cache between runs.
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: v1.59
+          args: --timeout=5m
+
+  # ============================================================
+  # Job 2: Test
+  # ============================================================
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    # This job can run in parallel with lint — they don't depend on each other.
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+          cache: true
+
+      # -race:              enable race detector (2-10x slower but catches real bugs)
+      # -coverprofile:      write coverage data to file
+      # -covermode=atomic:  required with -race for accurate coverage
+      # -timeout 120s:      fail fast — don't let a deadlock hang CI forever
+      - name: Test
+        run: go test -race -coverprofile=coverage.out -covermode=atomic -timeout=120s ./...
+
+      # Upload coverage to Codecov. Free for open source.
+      # Developers see coverage trends on PRs.
+      - name: Upload coverage
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./coverage.out
+          fail_ci_if_error: false   # don't fail CI if codecov is down
+
+  # ============================================================
+  # Job 3: Build
+  # ============================================================
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: [lint, test]   # only build if lint + test pass
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+          cache: true
+
+      # Build for multiple target platforms. Go cross-compilation is trivial.
+      # The three most important targets: Linux amd64 (most servers),
+      # Linux arm64 (AWS Graviton / Apple Silicon in prod), Darwin arm64 (dev Macs).
+      - name: Build (multi-platform)
+        run: |
+          mkdir -p bin
+          CGO_ENABLED=0 GOOS=linux   GOARCH=amd64 go build \
+            -ldflags="-s -w -X main.Version=${{ github.ref_name }} -X main.GitCommit=${{ github.sha }}" \
+            -o bin/server-linux-amd64 ./cmd/server
+          CGO_ENABLED=0 GOOS=linux   GOARCH=arm64 go build \
+            -ldflags="-s -w -X main.Version=${{ github.ref_name }} -X main.GitCommit=${{ github.sha }}" \
+            -o bin/server-linux-arm64 ./cmd/server
+          CGO_ENABLED=0 GOOS=darwin  GOARCH=arm64 go build \
+            -ldflags="-s -w -X main.Version=${{ github.ref_name }} -X main.GitCommit=${{ github.sha }}" \
+            -o bin/server-darwin-arm64 ./cmd/server
+
+      # Upload the linux-amd64 binary as a CI artifact. Available for 7 days.
+      # Useful for: debugging, hotfixes, manual deploys without rebuilding.
+      - name: Upload binary artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: server-linux-amd64
+          path: bin/server-linux-amd64
+          retention-days: 7
+
+  # ============================================================
+  # Job 4: Docker build and push (main branch only)
+  # ============================================================
+  docker:
+    name: Docker
+    runs-on: ubuntu-latest
+    needs: [build]   # only push if build passes
+    # Only push on main branch — PRs only build, they don't push.
+    # This prevents untrusted code from being pushed to your registry.
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    permissions:
+      contents: read
+      packages: write   # needed to push to ghcr.io
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Set up QEMU for multi-platform Docker builds (linux/amd64 + linux/arm64).
+      - uses: docker/setup-qemu-action@v3
+
+      # BuildKit enables parallel layer building and better caching.
+      - uses: docker/setup-buildx-action@v3
+
+      # Log in to GitHub Container Registry (ghcr.io).
+      # GITHUB_TOKEN is automatically provided — no manual secret setup.
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Extract metadata (tags, labels) from git.
+      # This generates tags like: ghcr.io/org/app:main, ghcr.io/org/app:sha-abc1234
+      - name: Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}
+          tags: |
+            type=ref,event=branch
+            type=sha,prefix=sha-,format=short
+            type=semver,pattern={{version}}
+
+      # Build and push the image.
+      # Tags with git SHA (immutable) AND branch name (mutable pointer to latest).
+      # Build args inject version metadata into the binary inside the image.
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            VERSION=${{ github.ref_name }}
+            GIT_COMMIT=${{ github.sha }}
+            BUILD_TIME=${{ github.event.head_commit.timestamp }}
+          # Cache layers from the previous build (speeds up Docker build).
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

@@ -1,0 +1,8 @@
+[
+  {"id": "s1", "category": "electronics", "amount": 199.99, "qty": 2},
+  {"id": "s2", "category": "books", "amount": 14.50, "qty": 3},
+  {"id": "s3", "category": "electronics", "amount": 49.00, "qty": 1},
+  {"id": "s4", "category": "books", "amount": 9.99, "qty": 5},
+  {"id": "s5", "category": "garden", "amount": 75.25, "qty": 1},
+  {"id": "s6", "category": "electronics", "amount": 12.00, "qty": 10}
+]
